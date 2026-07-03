@@ -1,0 +1,66 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "username": "Keyla",
+  "model": "gpt-5.4-mini",
+  "instructions": [
+    "CODEX.md",
+    "AGENTS.md",
+    "instructions/MINDSET.md",
+    "instructions/WORKFLOW.md",
+    "instructions/LANGUAGE.md",
+    "instructions/DROPBOX.md"
+  ],
+  "skills": {
+    "paths": ["."]
+  },
+  "mcp": {
+    "filesystem": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem"],
+      "enabled": true,
+      "timeout": 300000
+    },
+    "sequential-thinking": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "enabled": true,
+      "timeout": 300000
+    },
+    "memory": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
+      "enabled": true,
+      "timeout": 300000
+    },
+    "fetch": {
+      "type": "local",
+      "command": ["npx", "-y", "@kazuph/mcp-fetch"],
+      "enabled": true,
+      "timeout": 300000
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp"],
+      "enabled": true,
+      "timeout": 300000
+    },
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "environment": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" },
+      "enabled": false,
+      "timeout": 300000
+    },
+    "dropbox": {
+      "type": "local",
+      "command": ["python3", "mcp-bin/mcp-dropbox-lite.py"],
+      "environment": {
+        "DROPBOX_APP_KEY": "${DROPBOX_APP_KEY}",
+        "DROPBOX_APP_SECRET": "${DROPBOX_APP_SECRET}",
+        "DROPBOX_REFRESH_TOKEN": "${DROPBOX_REFRESH_TOKEN}"
+      },
+      "enabled": true,
+      "timeout": 300000
+    }
+  }
+}
