@@ -5,7 +5,7 @@ provider = "ollama"
 model = "qwen2.5-coder:1.5b"
 
 # ── MCPs ESSENCIAIS (sempre ativos) ──
-# MCPs pesados ficam inativos — ativar sob demanda
+# MCPs pesados ficam inativos — ativar sob demanda com: codex mcp add NOME
 
 [mcp_servers.filesystem]
 command = "npx"
@@ -17,14 +17,15 @@ args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
 
 [mcp_servers.fallback-model]
 command = "python3"
-args = ["mcp-bin/mcp-fallback.py"]
+args = ["/root/.config/opencode/mcp-bin/mcp-fallback.py"]
 
 [mcp_servers.dropbox-lite]
 command = "python3"
-args = ["mcp-bin/mcp-dropbox-lite.py"]
+args = ["/root/.config/opencode/mcp-bin/mcp-dropbox-lite.py"]
 
 # ── Lista de Provedores para fallback automático ──
 # Uso: CODEX_MODEL=groq/llama-3.1-8b-instant codex
+# Para ver lista: codex mcp get fallback-model
 
 [providers]
 order = [
@@ -41,3 +42,7 @@ order = [
 read = "allow"
 write = "allow"
 command = "allow"
+
+# ── GitHub Token (via env var) ──
+# [env]
+# GITHUB_TOKEN = "${GITHUB_TOKEN}"

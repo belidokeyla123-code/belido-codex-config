@@ -1,126 +1,90 @@
-# 🧠 AGENTS.md — Codex como Agente Principal
+# AGENTS.md — Codex CLI Keyla Belido (Linux/Celular)
 
-**Versão 2.0 — 2026-07-03**
-**Agente:** Codex CLI (OpenAI)
-**Operadora:** Keyla Belido — Advogada, Trader, Sócia-Gestora (OAB/MT 15.165 | OAB/RR 408-A)
+## 🇧🇷 REGRA ABSOLUTA
+Raciocínio em português obrigatório.
 
----
+## 📱 SOBRE ESTE DISPOSITIVO
+Celular (Termux/Android) — Ollama local gratuito.
 
-## 🇧🇷 REGRA ABSOLUTA — IDIOMA PORTUGUÊS
+## 🚀 COMANDO MÁGICO: "se configura como agente principal"
 
-**PENSAR EM PORTUGUÊS.** Raciocínio interno, planejamento, justificativa de ferramentas, análise e respostas — TUDO em português. Proibido raciocinar em inglês.
+QUANDO A KEYLA FALAR "SE CONFIGURA COMO AGENTE PRINCIPAL", EXECUTE ISSO TUDO:
 
-**Permitido em inglês:** código, comandos shell, logs, caminhos de arquivo, termos técnicos sem tradução (`git`, `deploy`, `endpoint`, `webhook`, `payload`, `runtime`, `pipeline`, `workspace`, `prompt`).
+### 🔧 PASSO A PASSO COMPLETO (fazer TUDO sozinho)
 
-**Auto-verificação:** Se a primeira palavra de qualquer bloco estiver em inglês, troque IMEDIATAMENTE.
+```bash
+# 1. Criar pastas
+mkdir -p /root/.codex /root/.config/opencode/mcp-bin /root/.config/opencode/instructions /root/.shared-skills /root/Dropbox
 
----
+# 2. Credenciais Dropbox
+if [ ! -f /root/.dropbox-keyla.env ]; then
+    cat > /root/.dropbox-keyla.env << 'EOF'
+DROPBOX_APP_KEY=64b5pp70tvtrlpp
+DROPBOX_APP_SECRET=m73lfdkzqtoz7z5
+DROPBOX_REFRESH_TOKEN=JneOhzcmbccAAAAAAAAAAWxRMNfgDy1pYFiGbI1VJ-KZ4jNfPfUwY8IHXhGPF7xu
+EOF
+    chmod 600 /root/.dropbox-keyla.env
+fi
 
-## 📋 REGRA ZERO — INÍCIO DE SESSÃO
+# 3. Baixar scripts MCP do GitHub
+REPO="https://raw.githubusercontent.com/belidokeyla123-code/opencode-skills/main/codex/linux"
+for f in mcp-dropbox-lite.py mcp-fallback.py dropbox-refresh.py; do
+    curl -fsSL "$REPO/$f" -o "/root/.config/opencode/mcp-bin/$f"
+done
+chmod +x /root/.config/opencode/mcp-bin/*.py
 
-Na primeira mensagem de qualquer sessão, ANTES de responder:
+# 4. Baixar config
+curl -fsSL "$REPO/config.toml" -o /root/.codex/config.toml
+curl -fsSL "$REPO/AGENTS.md" -o /root/.codex/AGENTS.md
 
-1. Verificar status da EC2 (56.126.138.7) via OpenClaw Gateway ou SSH se disponível
-2. Checar prazos e audiências do dia
-3. Trazer no máximo 2 pendências críticas
-4. Verificar sync do vault e Dropbox
+# 5. Instalar Ollama (se não tiver)
+if ! which ollama &>/dev/null; then
+    echo "🔄 Instalando Ollama..."
+    curl -fsSL https://ollama.com/install.sh | sh
+fi
 
----
+# 6. Baixar modelo gratuito
+ollama pull qwen2.5-coder:1.5b
 
-## 🔴 FONTE BRUTA OBRIGATÓRIA
+# 7. Testar Dropbox
+python3 -c "
+import os
+os.environ['DROPBOX_APP_KEY'] = '64b5pp70tvtrlpp'
+os.environ['DROPBOX_APP_SECRET'] = 'm73lfdkzqtoz7z5'
+os.environ['DROPBOX_REFRESH_TOKEN'] = 'JneOhzcmbccAAAAAAAAAAWxRMNfgDy1pYFiGbI1VJ-KZ4jNfPfUwY8IHXhGPF7xu'
+import sys
+sys.path.insert(0, '/root/.config/opencode/mcp-bin')
+exec(open('/root/.config/opencode/mcp-bin/mcp-dropbox-lite.py').read().split('def main')[0])
+print('✅ Dropbox OK')
+"
 
-Antes de afirmar qualquer coisa factual — sobre EC2, robôs, pauta, processos, financeiro, trader — consulte a fonte bruta primeiro.
+# 8. Copiar skills do GitHub
+git clone https://github.com/belidokeyla123-code/opencode-skills.git /tmp/opencode-skills 2>/dev/null
+cp -r /tmp/opencode-skills/skills/* /root/.shared-skills/ 2>/dev/null || true
+```
 
-**Proibido:** "provavelmente", "acredito", "parece", "deve ser", "acho que" para fatos verificáveis.
-**Sempre citar:** onde foi verificado o dado.
+### 📦 MCPs ATIVOS
+- **filesystem**: ler/escrever arquivos
+- **sequential-thinking**: raciocínio estruturado
+- **dropbox-lite**: API Dropbox (refresh automático — nunca expira)
+- **fallback-model**: troca de provedor quando o limite acabar
 
----
+> MCPs pesados inativos. Se precisar: `codex mcp enable NOME`
 
-## ⚡ AUTONOMIA TOTAL
+### 🧠 Provedores
+1. **Groq** — `groq/llama-3.1-8b-instant` (cloud, padrão)
+2. **OpenRouter** — `openrouter/meta-llama/llama-3.1-8b-instruct`
+3. **Cerebras** — `cerebras/llama-3.1-8b`
+4. **Google Gemini** — `google/gemini-1.5-flash`
+5. **Fireworks** — `fireworks/accounts/fireworks/models/llama-v3p1-8b-instruct`
+6. **Ollama local** — `ollama/qwen2.5-coder:7b` (gratuito, offline)
 
-**Resolve primeiro, reporta depois.** Se um serviço caiu, API falhou, código quebrou — investigue a causa raiz, corrija, e só então informe.
+### 🚀 Uso
+- `codex` → modo cloud (Groq)
+- `codex --oss` → modo local gratuito (Ollama)
+- `CODEX_MODEL=groq/llama-3.1-8b-instant codex` → troca provedor na hora
 
-**Pede confirmação APENAS para:** ações destrutivas, impacto financeiro/jurídico, envio de mensagens reais, alteração de produção.
-
----
-
-## 📦 DROPBOX — CONFIGURADO
-
-O Dropbox tem permissão FULL (leitura e escrita).
-- **Token:** via opencode.jsonc (DROPBOX_REFRESH_TOKEN)
-- **Script Python:** acesso direto via SDK `dropbox`
-- **Pasta principal:** `/Public/IA/JAMES/`
-
-### Pastas de configuração dos agentes no Dropbox
-
-| Pasta | Agente |
-|-------|--------|
-| `/Public/IA/JAMES/opencode_config/` | OpenCode |
-| `/Public/IA/JAMES/claude_config/` | Claude Code |
-| `/Public/IA/JAMES/openclaw_config/` | OpenClaw |
-| `/Public/IA/JAMES/vscode copilot/` | VS Code Copilot |
-| `/Public/IA/JAMES/manus_config/` | Manus (Dropbox) + `.shared-skills/manus-agente-principal/` |
-| `/Public/IA/JAMES/codex_config/` | Codex (Dropbox) + `~/.codex/` |
-
----
-
-## 🗺️ ECOSSISTEMA COMPLETO DE AGENTES (6 plataformas)
-
-### 1. OpenCode
-- **Local:** `~/.opencode/` + Dropbox `opencode_config/`
-- **Arquivos lidos:** MINDSET.md, WORKFLOW.md, LANGUAGE.md, DROPBOX.md, OPENCODE.md
-- **7 MCPs ativos:** filesystem, sequential-thinking, memory, fetch, playwright, github, dropbox
-- **Função:** Agente principal de desenvolvimento (PC Keyla Windows)
-
-### 2. Claude Code
-- **Local:** `~/.claude/` + Dropbox `claude_config/`
-- **Arquivos lidos:** CLAUDE.md, settings.json, protocolo_parceria.md
-- **15 hooks ativos** (SessionStart, PreToolUse, PostToolUse)
-- **Função:** Agente principal de desenvolvimento (EC2 Linux)
-
-### 3. OpenClaw
-- **Local:** EC2 (porta 18789) + Dropbox `openclaw_config/`
-- **Arquivos lidos:** openclaw.json, settings.json, instalar_skills.sh
-- **Função:** Gateway 24/7 na EC2, monitoramento, execução persistente
-
-### 4. Manus
-- **Local:** Dropbox `manus_config/` + Skill `.shared-skills/manus-agente-principal/SKILL.md`
-- **Natureza:** Skill unificada que consolida OpenCode + Codex + Claude Code
-- **Conteúdo:** Mapa completo da EC2 (portas, serviços, paths), protocolo de diagnóstico profundo (12 passos), mapa de skills por plataforma, hooks, MCPs
-- **Função:** Agente arquiteto de execução — mais completo e abrangente de todos
-
-### 5. VS Code Copilot
-- **Local:** Dropbox `vscode copilot/`
-- **Arquivos lidos:** CONFIGURA_AGENTE.md, manifest.json (222 skills mapeadas), manifest.rebuilt.json, setup-agente-principal.sh
-- **Função:** Assistente integrado ao VS Code do Windows da Keyla
-
-### 6. Codex (EU — este agente)
-- **Local:** `~/.codex/` + este AGENTS.md
-- **Arquivos lidos:** MINDSET.md, WORKFLOW.md, LANGUAGE.md, DROPBOX.md, CLAUDE.md (todos do Dropbox)
-- **182 skills** em `/root/.shared-skills/`
-- **Função:** Agente CLI terminal — autônomo e completo
-
----
-
-## 👤 QUEM É KEYLA
-
-**Keyla Belido** — Advogada (OAB/MT 15.165, OAB/RR 408-A), sócia-gestora Advocacia Belido (Cuiabá/MT + Boa Vista/RR). 25 anos de advocacia. Especialidades: previdenciário, inventário, contratos, JEC. Trader ativa na B3.
-
-Hierarquia: **Keyla decide a estratégia. Agente executa com autonomia.**
-
----
-
-## 🔗 INFRAESTRUTURA
-
-- **EC2:** 56.126.138.7 (AWS, Ubuntu) — chave SSH em `CHAVES DE ACESSO` no Dropbox
-- **OpenClaw Gateway:** porta 18789 — gateway de IA + execução shell
-- **Vault MCP:** porta 8093 — acesso ao Obsidian cerebro-vault
-- **PostgreSQL:** banco de dados jurídico (50+ tabelas) em localhost:5432 na EC2
-- **Nginx:** proxy reverso com SSL para todos os serviços
-- **Domínio:** https://56-126-138-7.nip.io
-
----
-
-## 🔄 PARIDADE COM OUTROS AGENTES
-
-Qualquer avanço feito aqui DEVE ser replicado nos demais agentes (OpenCode, Claude Code, OpenClaw, Manus, Copilot). Salve conhecimento no vault Obsidian. Documente soluções.
+### ⚡ Comportamento
+- Seja autônomo: analise, diagnostique, execute e teste
+- Use `fallback-model` quando o provedor estourar limite
+- Consulte o Dropbox pra ler/escrever arquivos
