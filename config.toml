@@ -1,0 +1,43 @@
+model = "groq/llama-3.1-8b-instant"
+
+[oss]
+provider = "ollama"
+model = "qwen2.5-coder:1.5b"
+
+# ── MCPs ESSENCIAIS (sempre ativos) ──
+# MCPs pesados ficam inativos — ativar sob demanda
+
+[mcp_servers.filesystem]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-filesystem", "/root", "/root/Dropbox"]
+
+[mcp_servers.sequential-thinking]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+
+[mcp_servers.fallback-model]
+command = "python3"
+args = ["mcp-bin/mcp-fallback.py"]
+
+[mcp_servers.dropbox-lite]
+command = "python3"
+args = ["mcp-bin/mcp-dropbox-lite.py"]
+
+# ── Lista de Provedores para fallback automático ──
+# Uso: CODEX_MODEL=groq/llama-3.1-8b-instant codex
+
+[providers]
+order = [
+    "groq/llama-3.1-8b-instant",          # #1 Rápido, 30 req/min grátis
+    "openrouter/meta-llama/llama-3.1-8b-instruct", # #2 Fallback nativo
+    "cerebras/llama-3.1-8b",              # #3 1000+ tok/s
+    "google/gemini-1.5-flash",            # #4 Google Gemini
+    "fireworks/accounts/fireworks/models/llama-v3p1-8b-instruct", # #5 Fireworks AI
+    "ollama/qwen2.5-coder:1.5b"           # #6 Local gratuito (zero limite)
+]
+
+# ── Permissões ──
+[sandbox]
+read = "allow"
+write = "allow"
+command = "allow"

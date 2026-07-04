@@ -1,22 +1,56 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "username": "Keyla",
-  "model": "gpt-5.4-mini",
+  "model": "groq/llama-3.1-8b-instant",
+  "small_model": "groq/llama-3.1-8b-instant",
   "instructions": [
     "CODEX.md",
     "AGENTS.md",
     "instructions/MINDSET.md",
     "instructions/WORKFLOW.md",
     "instructions/LANGUAGE.md",
-    "instructions/DROPBOX.md"
+    "instructions/DROPBOX.md",
+    "instructions/MCPS.md",
+    "instructions/SKILLS_MAP.md",
+    "instructions/EC2_MAP.md",
+    "instructions/KEYLA.md"
   ],
   "skills": {
     "paths": ["."]
   },
+  "provider": {
+    "openrouter": {
+      "models": {
+        "meta-llama/llama-3.1-8b-instruct": {}
+      }
+    },
+    "groq": {
+      "whitelist": [
+        "llama-3.1-8b-instant",
+        "mixtral-8x7b-32768"
+      ]
+    },
+    "google": {
+      "whitelist": [
+        "gemini-1.5-flash"
+      ]
+    },
+    "cerebras": {
+      "whitelist": [
+        "llama-3.1-8b"
+      ]
+    },
+    "fireworks": {
+      "whitelist": [
+        "accounts/fireworks/models/llama-v3p1-8b-instruct"
+      ]
+    },
+    "ollama": {}
+  },
   "mcp": {
     "filesystem": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem"],
+      "command": ["npx", "-y", "@modelcontextprotocol/server-filesystem", "/root", "/root/Dropbox"],
       "enabled": true,
       "timeout": 300000
     },
@@ -29,26 +63,26 @@
     "memory": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
-      "enabled": true,
+      "enabled": false,
       "timeout": 300000
     },
     "fetch": {
       "type": "local",
       "command": ["npx", "-y", "@kazuph/mcp-fetch"],
-      "enabled": true,
+      "enabled": false,
       "timeout": 300000
     },
     "playwright": {
       "type": "local",
       "command": ["npx", "-y", "@playwright/mcp"],
-      "enabled": true,
+      "enabled": false,
       "timeout": 300000
     },
     "github": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
       "environment": { "GITHUB_TOKEN": "${GITHUB_TOKEN}" },
-      "enabled": false,
+      "enabled": true,
       "timeout": 300000
     },
     "dropbox": {
@@ -61,6 +95,70 @@
       },
       "enabled": true,
       "timeout": 300000
+    },
+    "outlook": {
+      "type": "local",
+      "command": ["python3", "mcp-bin/mcp-outlook.py"],
+      "enabled": false,
+      "timeout": 300000
+    },
+    "postgres": {
+      "type": "local",
+      "command": ["python3", "mcp-bin/mcp-postgres-ec2.py"],
+      "enabled": false,
+      "timeout": 300000
+    },
+    "vault-brain": {
+      "type": "remote",
+      "url": "http://56.126.138.7:8093/mcp",
+      "enabled": false,
+      "timeout": 300000
+    },
+    "fallback": {
+      "type": "local",
+      "command": ["python3", "mcp-bin/mcp-fallback.py"],
+      "enabled": true,
+      "timeout": 300000
     }
+  },
+  "permission": {
+    "read": "allow",
+    "list": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "edit": "allow",
+    "write": "allow",
+    "websearch": "allow",
+    "webfetch": "allow",
+    "question": "allow",
+    "todowrite": "allow",
+    "task": "allow",
+    "skill": "allow",
+    "external_directory": {
+      "*": "ask",
+      "/root/**": "allow"
+    },
+    "bash": {
+      "*": "allow",
+      "rm -rf /": "deny",
+      "sudo rm -rf /": "deny",
+      "rm -rf /*": "deny",
+      "dd if=*": "deny",
+      "mkfs*": "deny",
+      "shutdown*": "deny",
+      "reboot": "deny",
+      "halt": "deny"
+    }
+  },
+  "experimental": {
+    "mcp_timeout": 300000
+  },
+  "tool_output": {
+    "max_lines": 300,
+    "max_bytes": 20000
+  },
+  "compaction": {
+    "auto": true,
+    "tail_turns": 15
   }
 }
